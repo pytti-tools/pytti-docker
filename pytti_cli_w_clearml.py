@@ -317,7 +317,15 @@ if __name__ == '__main__':
         if params.display_every > 0 and i % params.display_every == 0:
           print(f"Step {i} losses:")
           if model.dataframe:
-            print(model.dataframe[0].iloc[-1])
+            rec = model.dataframe[0].iloc[-1]
+            print(rec)
+            for k,v in rec.iteritems():
+                task.get_logger().report_scalar(
+                    "losses",
+                    f"{k}",
+                    value=v,
+                    iteration=i
+                    )
           if params.approximate_vram_usage:
             print("VRAM Usage:")
             print_vram_usage()
