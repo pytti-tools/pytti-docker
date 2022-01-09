@@ -110,5 +110,11 @@ RUN touch ./GMA/core/__init__.py
 
 #############
 
+RUN pip install clearml
+COPY pytti_cli_w_clearml.py .
+#COPY clearml.conf /home/clearml.conf
+COPY clearml.conf /root/clearml.conf
+COPY default_params.json .
+
 #CMD jupyter notebook --NotebookApp.allow_origin='https://colab.research.google.com' --allow-root --port $COLAB_PORT --NotebookApp.port_retries=0 --ip 0.0.0.0
 CMD jupyter notebook --port $COLAB_PORT --NotebookApp.port_retries=0 --ip 0.0.0.0 --no-browser --NotebookApp.token=UniqueNewYork --allow-root
