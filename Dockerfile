@@ -116,5 +116,10 @@ COPY pytti_cli_w_clearml.py .
 COPY clearml.conf /root/clearml.conf
 COPY default_params.json .
 
+#RUN mkdir -p /opt/colab
+#WORKDIR /opt/colab
+#RUN mkdir -p /opt/colab/projdata
+RUN mkdir -p /opt/colab/images_out
+
 #CMD jupyter notebook --NotebookApp.allow_origin='https://colab.research.google.com' --allow-root --port $COLAB_PORT --NotebookApp.port_retries=0 --ip 0.0.0.0
 CMD jupyter notebook --port $COLAB_PORT --NotebookApp.port_retries=0 --ip 0.0.0.0 --no-browser --NotebookApp.token=UniqueNewYork --allow-root

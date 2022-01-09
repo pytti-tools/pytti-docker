@@ -6,6 +6,18 @@ task = Task.init(
 )
 #auto_connect_arg_parser=True,
 
+# TO DO: 
+# https://github.com/allegroai/clearml/blob/master/examples/frameworks/hydra/hydra_example.py
+
+def outdir_from_clearml_task(task):
+    ts = task.data.created.strftime("%Y-%m-%d_%H-%M-%S")
+    path = f"{task.project}/{ts}_{task.id}"
+    return path
+
+OUTPREFIX = outdir_from_clearml_task(task)
+OUTPATH = f"images_out/{OUTPREFIX}"
+OUTTERPATH = f"/opt/projdata/{OUTPREFIX}"
+
 import json
 from bunch import Bunch
 with open('default_params.json','r') as f:
@@ -251,13 +263,13 @@ if __name__ == '__main__':
         loss_augs.append(TVLoss(weight = params.smoothing_weight))
 
       #set up filespace
-      Path(f'images_out/{params.file_namespace}').mkdir(parents=True, exist_ok=True)
+      Path(f'{OUTPATH}/{params.file_namespace}').mkdir(parents=True, exist_ok=True)
       Path(f'backup/{params.file_namespace}').mkdir(parents=True, exist_ok=True)
       if restore:
         base_name = params.file_namespace if restore_run == 0 else f'{params.file_namespace}({restore_run})'
       elif not params.allow_overwrite:
         #finds the next available base_name to save files with. Why did I do this with regex? 
-        _, i = get_next_file(f'images_out/{params.file_namespace}', 
+        _, i = get_next_file(f'{OUTPATH}/{params.file_namespace}', 
                              f'^(?P<pre>{re.escape(params.file_namespace)}\\(?)(?P<index>\\d*)(?P<post>\\)?_1\\.png)$',
                              [f"{params.file_namespace}_1.png",f"{params.file_namespace}(1)_1.png"])
         base_name = params.file_namespace if i == 0 else f'{params.file_namespace}({i})'
@@ -276,12 +288,12 @@ if __name__ == '__main__':
           img.load_state_dict(torch.load(f'backup/{params.file_namespace}/{filename}'))
         else:#reencode
           if restore_frame == latest:
-            filename, restore_frame = get_last_file(f'images_out/{params.file_namespace}', 
+            filename, restore_frame = get_last_file(f'{OUTPATH}/{params.file_namespace}', 
                                                     f'^(?P<pre>{re.escape(base_name)}_)(?P<index>\\d*)(?P<post>\\.png)$')
           else: 
             filename = f'{base_name}_{restore_frame}.png'
           print("restoring from", filename)
-          img.encode_image(Image.open(f'images_out/{params.file_namespace}/{filename}').convert('RGB'))
+          img.encode_image(Image.open(f'{OUTPATH}/{params.file_namespace}/{filename}').convert('RGB'))
         i = restore_frame*params.save_every
       else:
         i = 0
@@ -329,11 +341,12 @@ if __name__ == '__main__':
           except NameError:
             im = img.decode_image()
           n = i//params.save_every
-          filename = f"images_out/{params.file_namespace}/{base_name}_{n}.png"
+          filename = f"{OUTPATH}/{params.file_namespace}/{base_name}_{n}.png"
           im.save(filename)
           ####################
           ## DMARX
-          task.upload_artifact(name=filename, artifact_object=im)
+          #task.upload_artifact(name=filename, artifact_object=filename)
+          task.upload_artifact(name=filename, artifact_object=OUTTERPATH)
           logger = task.get_logger()
           logger.report_media(
             'images', 'pytti output', iteration=i,
@@ -429,8 +442,8 @@ if __name__ == '__main__':
 
       model.update = update
 
-      print(f"Settings saved to images_out/{params.file_namespace}/{base_name}_settings.txt")
-      save_settings(params, f"images_out/{params.file_namespace}/{base_name}_settings.txt")
+      print(f"Settings saved to {OUTPATH}/{params.file_namespace}/{base_name}_settings.txt")
+      save_settings(params, f"{OUTPATH}/{params.file_namespace}/{base_name}_settings.txt")
 
       skip_prompts = i // params.steps_per_scene
       skip_steps   = i %  params.steps_per_scene
@@ -457,9 +470,9 @@ if __name__ == '__main__':
         else:
           settings_list = batch_list
           namespace = batch_list[0]['file_namespace']
-          subprocess.run(['mkdir','-p',f'images_out/{namespace}'])
-          save_batch(batch_list, f'images_out/{namespace}/{namespace}_batch settings.txt')
-          print(f"Batch settings saved to images_out/{namespace}/{namespace}_batch settings.txt")
+          subprocess.run(['mkdir','-p',f'{OUTPATH}/{namespace}'])
+          save_batch(batch_list, f'{OUTPATH}/{namespace}/{namespace}_batch settings.txt')
+          print(f"Batch settings saved to {OUTPATH}/{namespace}/{namespace}_batch settings.txt")
         for settings in settings_list:
           setting_string = json.dumps(settings)
           print("SETTINGS:")
