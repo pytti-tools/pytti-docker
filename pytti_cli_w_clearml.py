@@ -1,5 +1,10 @@
 from clearml import Task
-task = Task.init(project_name="PYTTI", task_name="cli test")
+task = Task.init(
+    project_name="PYTTI", 
+    task_name="cli test",
+    reuse_last_task_id=False
+)
+#auto_connect_arg_parser=True,
 
 import json
 from bunch import Bunch
@@ -322,6 +327,16 @@ if __name__ == '__main__':
           n = i//params.save_every
           filename = f"images_out/{params.file_namespace}/{base_name}_{n}.png"
           im.save(filename)
+          ####################
+          ## DMARX
+          task.upload_artifact(name=filename, artifact_object=im)
+          logger = task.get_logger()
+          logger.report_media(
+            'images', 'pytti output', iteration=i,
+             local_path=filename)
+          #reuse_last_task_id=False
+          #auto_connect_arg_parser=True,
+          ####################
           if params.backups > 0:
             filename = f"backup/{params.file_namespace}/{base_name}_{n}.bak"
             torch.save(img.state_dict(), filename)
