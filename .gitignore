@@ -1,0 +1,5 @@
+clearml.conf
+models/**
+*.pt
+.ipynb_checkpoints/**
+*tmp
