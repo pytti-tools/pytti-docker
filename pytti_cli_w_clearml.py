@@ -91,6 +91,10 @@ if __name__ == '__main__':
     else:
       try:
         params = default_params
+        # https://clear.ml/docs/latest/docs/guides/reporting/hyper_parameters/
+        params = task.connect(params) # 
+        # uh...
+        params = Bunch(params) # fuck it... # probably easier to use an argparse namesapce here
       except NameError:
         raise RuntimeError("ERROR: no parameters. Please run parameters (step 2.1).")
     #@markdown check `restore` to restore from a previous run
