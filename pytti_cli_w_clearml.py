@@ -4,6 +4,9 @@ task = Task.init(
     task_name="cli test",
     reuse_last_task_id=False
 )
+
+task.execute_remotely(queue_name="art")
+
 #auto_connect_arg_parser=True,
 
 # TO DO: 
@@ -15,8 +18,10 @@ def outdir_from_clearml_task(task):
     return path
 
 OUTPREFIX = outdir_from_clearml_task(task)
-OUTPATH = f"images_out/{OUTPREFIX}"
-OUTTERPATH = f"/opt/projdata/{OUTPREFIX}"
+#OUTPATH = f"images_out/{OUTPREFIX}"
+#OUTTERPATH = f"/opt/projdata/{OUTPREFIX}"
+OUTPATH = f"/opt/colab/images_out/{OUTPREFIX}"
+OUTTERPATH = OUTPATH
 
 import json
 from bunch import Bunch
@@ -383,6 +388,20 @@ if __name__ == '__main__':
               next_step_pil = zoom_2d(img, 
                                       (tx,ty), (zx,zy), theta, 
                                       border_mode = params.infill_mode, sampling_mode = params.sampling_mode)
+              ################ DMARX
+              for k,v in {'tx':tx,
+                          'ty':ty,
+                          'theta':theta,
+                          'zx':zx,
+                          'zy':zy, 
+                          't':t}.items():
+                task.get_logger().report_scalar(
+                    "translation_2d",
+                    f"{k}",
+                    value=v,
+                    iteration=i
+                    )
+              ###########################
             elif params.animation_mode == "3D":
               try:
                 im
