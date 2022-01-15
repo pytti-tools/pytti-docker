@@ -7,6 +7,16 @@ task = Task.init(
 
 task.execute_remotely(queue_name="art")
 
+import os
+
+print(os.getcwd())
+print(os.listdir())
+
+# I really hate this...
+os.chdir('/opt/colab')
+print(os.getcwd())
+print(os.listdir())
+
 #auto_connect_arg_parser=True,
 
 # TO DO: 

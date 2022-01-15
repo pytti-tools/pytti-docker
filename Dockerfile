@@ -30,6 +30,9 @@ RUN apt-get install -y \
 RUN ${PIP} --no-cache-dir install --upgrade \
     pip \
     setuptools
+    
+#RUN ${PIP} --no-cache-dir install --upgrade pip
+#RUN ${PIP} install setuptools==1.1.5
 
 RUN ln -s $(which ${PYTHON}) /usr/local/bin/python
 
@@ -41,11 +44,11 @@ WORKDIR /opt/colab
 COPY pytti_5_beta.ipynb .
 
 #RUN pip install -r requirements.txt \
-RUN pip install jupyterlab==3.2.5 ipywidgets \
+RUN ${PIP} install jupyterlab==3.2.5 ipywidgets \
     && jupyter nbextension enable --py widgetsnbextension
     
 # https://pytorch.org/get-started/locally/
-RUN pip3 install \ 
+RUN ${PIP} install \ 
       torch==1.10.1+cu113 \
       torchvision==0.11.2+cu113 \
       torchaudio==0.10.1+cu113 -f https://download.pytorch.org/whl/cu113/torch_stable.html
@@ -59,27 +62,31 @@ ENV COLAB_PORT ${COLAB_PORT}
 
 # `install_everything()`
 # tensorflow#==1.15.2 \
-RUN pip install \
-   gdown \
-   tensorflow \
-   transformers \
-   PyGLM \
-   ftfy \
+RUN ${PIP} install \
+   tensorflow==2.7.0 \
+   transformers==4.15.0
+
+RUN ${PIP} install \
+   gdown===4.2.0 \
+   PyGLM==2.5.7 \
+   ftfy==6.0.3 \
    regex \
-   tqdm \
-   omegaconf \ 
-   pytorch-lightning \
-   kornia \
-   einops \
-   imageio-ffmpeg \
+   tqdm==4.62.3 \
+   omegaconf==2.1.1 \ 
+   pytorch-lightning==1.5.7 \
+   kornia==0.6.2 \
+   einops==0.3.2 \
+   imageio-ffmpeg==0.4.5 \
    adjustText \ 
    exrex \ 
-   bunch \
-   matplotlib-label-lines \
-   pandas \
-   imageio \
-   seaborn \
-   sklearn
+   bunch==1.0.1 \
+   matplotlib-label-lines==0.4.3 \
+   pandas==1.3.4 \
+   imageio==2.13.5 \
+   seaborn==0.11.2 \
+   scikit-learn
+   #sklearn
+   #regex==2.5.109 \
 
 RUN apt-get install -y git
 
@@ -97,20 +104,23 @@ COPY models/AdaBins_nyu.pt AdaBins/pretrained/
 RUN DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get -y install tzdata
 
 # install cv2
+# experiencing issues all of a sudden. Hopefully --fix-missing resolves it?
+RUN apt-get update --fix-missing
 RUN apt-get install -y python3-opencv
 
-#RUN echo $PATH
-#ENV PATH="${PATH}:./GMA/core"
-#ENV PATH="$PATH:./GMA/core"
-ENV PYTHONPATH=./GMA/core
-#RUN echo $PATH
+#ENV PYTHONPATH=./GMA/core
+#ENV PYTHONPATH=./GMA/core:.
+#ENV PYTHONPATH=./GMA/core:./:./pytti:/opt/colab
+ENV PYTHONPATH=/opt/colab/GMA/core:./:./pytti:/opt/colab
+
 
 # this works
-RUN touch ./GMA/core/__init__.py
+#RUN touch ./GMA/core/__init__.py
+RUN touch /opt/colab/GMA/core/__init__.py
 
 #############
 
-RUN pip install clearml
+RUN ${PIP} install clearml==1.1.5
 COPY pytti_cli_w_clearml.py .
 #COPY clearml.conf /home/clearml.conf
 COPY clearml.conf /root/clearml.conf
