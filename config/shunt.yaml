@@ -1,3 +1,3 @@
-animation_mode: ${animation.animation_mode}
-translate_z_3d: ${animation.translate_z_3d}
-rotate_3d: ${animation.rotate_3d}
+animation_mode: ${animation_mode.animation_mode}
+translate_z_3d: ${animation_mode.translate_z_3d}
+rotate_3d: ${animation_mode.rotate_3d}

@@ -1,5 +1,5 @@
 defaults:
-  - animation: 3D
+  - animation_mode: 3D
   - shunt
 
 scenes: deep space habitation ring made of glass | galactic nebula | wow! space is
