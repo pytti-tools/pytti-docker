@@ -1,3 +1,7 @@
+defaults:
+  - animation: 3D
+  - shunt
+
 scenes: deep space habitation ring made of glass | galactic nebula | wow! space is
   full of fractal creatures darting around everywhere like fireflies
 scene_prefix: 'astrophotography #pixelart | image credit nasa | space full of cybernetic
@@ -25,7 +29,6 @@ palette_normalization_weight: 0.2
 show_palette: false
 target_palette: ''
 lock_palette: false
-animation_mode: 3D
 sampling_mode: bicubic
 infill_mode: wrap
 pre_animation_steps: 100

@@ -136,11 +136,13 @@ from omegaconf import OmegaConf, DictConfig
 
 #conf = OmegaConf.create(default_params)
 #OmegaConf.save(conf, f="default_params.yaml")
+
+from loguru import logger
     
 @hydra.main(config_path="config", config_name="default")
 def _main(cfg: DictConfig):
-    default_params = OmegaConf.to_container(cfg)
-
+    default_params = OmegaConf.to_container(cfg, resolve=True)
+    logger.debug(default_params)
     latest = -1
     #@markdown check `batch_mode` to run batch settings
     batch_mode = False #@param{type:"boolean"}
