@@ -54,11 +54,11 @@ if not TASK_IS_LOCAL:
     OUTPATH = f"/opt/colab/images_out/{OUTPREFIX}"
 OUTTERPATH = OUTPATH
 
-import json
+#import json
 from bunch import Bunch
-with open('default_params.json','r') as f:
-    #default_params = Bunch(json.load(f))
-    default_params = json.load(f)
+#with open('default_params.json','r') as f:
+#    #default_params = Bunch(json.load(f))
+#    default_params = json.load(f)
 
 #####################
 
@@ -134,11 +134,12 @@ pd.options.display.width = 175
 import hydra
 from omegaconf import OmegaConf, DictConfig
 
-conf = OmegaConf.create(default_params)
-OmegaConf.save(conf, f="default_params.yaml")
+#conf = OmegaConf.create(default_params)
+#OmegaConf.save(conf, f="default_params.yaml")
     
-@hydra.main(config_path=".", config_name="default_params")
+@hydra.main(config_path="config", config_name="default")
 def _main(cfg: DictConfig):
+    default_params = OmegaConf.to_container(cfg)
 
     latest = -1
     #@markdown check `batch_mode` to run batch settings
