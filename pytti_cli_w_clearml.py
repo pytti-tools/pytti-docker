@@ -1,22 +1,37 @@
-from clearml import Task
-task = Task.init(
-    project_name="PYTTI", 
-    task_name="cli test",
-    reuse_last_task_id=False
-)
+USE_CLEARML = True
+try:
+    from clearml import Task
+    task = Task.init(
+        project_name="PYTTI",
+        task_name="cli test",
+        reuse_last_task_id=False
+    )
+    #task.execute_remotely(queue_name="art")
+except ImportError:
+    USE_CLEARML = False
+    
+from torch.utils.tensorboard import SummaryWriter
+writer = SummaryWriter()
 
-task.execute_remotely(queue_name="art")
-
-import os
-
-print(os.getcwd())
-print(os.listdir())
+import os, sys
 
 # I really hate this...
-os.chdir('/opt/colab')
-print(os.getcwd())
-print(os.listdir())
+# make this a commandline arg or maybe even an environment variable
+TASK_IS_LOCAL=True
+if USE_CLEARML:
+    if not task.running_locally():
+        os.chdir('/opt/colab')
+        TASK_IS_LOCAL=False
 
+# fix path for our shitty imports.
+if TASK_IS_LOCAL:
+    cwd = os.getcwd()
+    sys.path.append(f'{cwd}/GMA/core')
+    sys.path.append(f'{cwd}/pytti')
+    
+
+print(os.getcwd())
+        
 #auto_connect_arg_parser=True,
 
 # TO DO: 
@@ -27,16 +42,22 @@ def outdir_from_clearml_task(task):
     path = f"{task.project}/{ts}_{task.id}"
     return path
 
-OUTPREFIX = outdir_from_clearml_task(task)
+OUTPREFIX = 'foobar'
+if USE_CLEARML:
+    OUTPREFIX = outdir_from_clearml_task(task)
 #OUTPATH = f"images_out/{OUTPREFIX}"
 #OUTTERPATH = f"/opt/projdata/{OUTPREFIX}"
-OUTPATH = f"/opt/colab/images_out/{OUTPREFIX}"
+
+OUTPATH = f"{os.getcwd()}/images_out/{OUTPREFIX}"
+if not TASK_IS_LOCAL:
+    OUTPATH = f"/opt/colab/images_out/{OUTPREFIX}"
 OUTTERPATH = OUTPATH
 
 import json
 from bunch import Bunch
 with open('default_params.json','r') as f:
-    default_params = Bunch(json.load(f))
+    #default_params = Bunch(json.load(f))
+    default_params = json.load(f)
 
 if __name__ == '__main__':
 
@@ -119,7 +140,8 @@ if __name__ == '__main__':
       try:
         params = default_params
         # https://clear.ml/docs/latest/docs/guides/reporting/hyper_parameters/
-        params = task.connect(params) # 
+        #params = task.connect(params) # 
+        writer.add_hparams(hparam_dict=params, metric_dict={})
         # uh...
         params = Bunch(params) # fuck it... # probably easier to use an argparse namesapce here
       except NameError:
@@ -369,11 +391,22 @@ if __name__ == '__main__':
           ####################
           ## DMARX
           #task.upload_artifact(name=filename, artifact_object=filename)
-          task.upload_artifact(name=filename, artifact_object=OUTTERPATH)
-          logger = task.get_logger()
-          logger.report_media(
-            'images', 'pytti output', iteration=i,
-             local_path=filename)
+          #task.upload_artifact(name=filename, artifact_object=OUTTERPATH) # fuck that....
+        
+          #logger = task.get_logger()
+          #logger.report_media(
+          #  'images', 'pytti output', iteration=i,
+          #   local_path=filename)
+          im_np = np.array(im)
+          writer.add_image(
+              tag='pytti output',
+              #img_tensor=filename, # thought this would work?
+              img_tensor=im_np,
+              global_step=i,
+              dataformats="HWC" # this was the key
+          )
+        
+        
           #reuse_last_task_id=False
           #auto_connect_arg_parser=True,
           ####################
@@ -496,7 +529,10 @@ if __name__ == '__main__':
         last_scene = scene
       if fig:
         del fig, axs
-
+      ############################# DMARX
+      writer.close()
+      #############################
+        
     #if __name__ == '__main__':
     try:
       gc.collect()
