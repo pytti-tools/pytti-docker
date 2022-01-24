@@ -134,5 +134,8 @@ RUN mkdir -p /opt/colab/images_out
 # TO DO: pre-download VQGAN models
 RUN apt-get install -y curl
 
+# for video in/out
+RUN apt-get install -y ffmpeg
+
 #CMD jupyter notebook --NotebookApp.allow_origin='https://colab.research.google.com' --allow-root --port $COLAB_PORT --NotebookApp.port_retries=0 --ip 0.0.0.0
 CMD jupyter notebook --port $COLAB_PORT --NotebookApp.port_retries=0 --ip 0.0.0.0 --no-browser --NotebookApp.token=UniqueNewYork --allow-root
