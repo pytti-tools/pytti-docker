@@ -1,0 +1,2 @@
+translate_z_3d: (50+10*t)*sin(t/10*pi)**2
+rotate_3d: '[cos(radians(1.5)), 0, -sin(radians(1.5))/sqrt(2), sin(radians(1.5))/sqrt(2)]'
