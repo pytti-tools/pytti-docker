@@ -1,3 +1,4 @@
+# would be better if Task.init() was called inside the hydra app
 USE_CLEARML = True
 try:
     from clearml import Task
@@ -59,74 +60,85 @@ with open('default_params.json','r') as f:
     #default_params = Bunch(json.load(f))
     default_params = json.load(f)
 
-if __name__ == '__main__':
+#####################
 
-    from pathlib import Path
+from pathlib import Path
 
-    import torch
+import torch
 
-    from os.path import exists as path_exists
-    #if path_exists('/content/drive/MyDrive/pytti_test'):
-    #  %cd /content/drive/MyDrive/pytti_test
-    #  drive_mounted = True
-    #else:
-    #  drive_mounted = False
-    drive_mounted = False
-    try:
-      from pytti.Notebook import *
-    except ModuleNotFoundError:
-      if drive_mounted:
-        #THIS IS NOT AN ERROR. This is the code that would
-        #make an error if something were wrong.
-        raise RuntimeError('ERROR: please run setup (step 1.3).')
-      else:
-        #THIS IS NOT AN ERROR. This is the code that would
-        #make an error if something were wrong.
-        raise RuntimeError('WARNING: drive is not mounted.\nERROR: please run setup (step 1.3).')
-    change_tqdm_color()
-    import sys
-    sys.path.append('./AdaBins')
-    print(sys.path)
+from os.path import exists as path_exists
+#if path_exists('/content/drive/MyDrive/pytti_test'):
+#  %cd /content/drive/MyDrive/pytti_test
+#  drive_mounted = True
+#else:
+#  drive_mounted = False
+drive_mounted = False
+try:
+  from pytti.Notebook import *
+except ModuleNotFoundError:
+  if drive_mounted:
+    #THIS IS NOT AN ERROR. This is the code that would
+    #make an error if something were wrong.
+    raise RuntimeError('ERROR: please run setup (step 1.3).')
+  else:
+    #THIS IS NOT AN ERROR. This is the code that would
+    #make an error if something were wrong.
+    raise RuntimeError('WARNING: drive is not mounted.\nERROR: please run setup (step 1.3).')
+change_tqdm_color()
+import sys
+sys.path.append('./AdaBins')
+print(sys.path)
 
-    try:
-      from pytti import Perceptor
-    except ModuleNotFoundError:
-      if drive_mounted:
-        #THIS IS NOT AN ERROR. This is the code that would
-        #make an error if something were wrong.
-        raise RuntimeError('ERROR: please run setup (step 1.3).')
-      else:
-        #THIS IS NOT AN ERROR. This is the code that would
-        #make an error if something were wrong.
-        raise RuntimeError('WARNING: drive is not mounted.\nERROR: please run setup (step 1.3).')
-    print("Loading pytti...")
-    from pytti.Image import PixelImage, RGBImage, VQGANImage
-    from pytti.ImageGuide import DirectImageGuide
-    from pytti.Perceptor.Embedder import HDMultiClipEmbedder
-    from pytti.Perceptor.Prompt import parse_prompt
-    from pytti.LossAug import TVLoss, HSVLoss, OpticalFlowLoss, TargetFlowLoss
-    from pytti.Transforms import zoom_2d, zoom_3d, apply_flow
-    from pytti import *
-    from pytti.LossAug.DepthLoss import init_AdaBins
-    print("pytti loaded.")
+try:
+  from pytti import Perceptor
+except ModuleNotFoundError:
+  if drive_mounted:
+    #THIS IS NOT AN ERROR. This is the code that would
+    #make an error if something were wrong.
+    raise RuntimeError('ERROR: please run setup (step 1.3).')
+  else:
+    #THIS IS NOT AN ERROR. This is the code that would
+    #make an error if something were wrong.
+    raise RuntimeError('WARNING: drive is not mounted.\nERROR: please run setup (step 1.3).')
+print("Loading pytti...")
+from pytti.Image import PixelImage, RGBImage, VQGANImage
+from pytti.ImageGuide import DirectImageGuide
+from pytti.Perceptor.Embedder import HDMultiClipEmbedder
+from pytti.Perceptor.Prompt import parse_prompt
+from pytti.LossAug import TVLoss, HSVLoss, OpticalFlowLoss, TargetFlowLoss
+from pytti.Transforms import zoom_2d, zoom_3d, apply_flow
+from pytti import *
+from pytti.LossAug.DepthLoss import init_AdaBins
+print("pytti loaded.")
 
-    import torch, gc, glob, subprocess, warnings, re, math, json
-    import numpy as np
-    from IPython import display
-    from PIL import Image, ImageEnhance
+import torch, gc, glob, subprocess, warnings, re, math, json
+import numpy as np
+from IPython import display
+from PIL import Image, ImageEnhance
 
-    from torchvision.transforms import functional as TF
+from torchvision.transforms import functional as TF
 
-    #display settings, because usability counts
-    #warnings.filterwarnings("error", category=UserWarning)
-    #%matplotlib inline 
-    import matplotlib.pyplot as plt
-    import seaborn as sns
-    sns.set()
-    import pandas as pd
-    plt.style.use('bmh')
-    pd.options.display.max_columns = None
-    pd.options.display.width = 175
+#display settings, because usability counts
+#warnings.filterwarnings("error", category=UserWarning)
+#%matplotlib inline 
+import matplotlib.pyplot as plt
+import seaborn as sns
+sns.set()
+import pandas as pd
+plt.style.use('bmh')
+pd.options.display.max_columns = None
+pd.options.display.width = 175
+
+#####################
+    
+import hydra
+from omegaconf import OmegaConf, DictConfig
+
+conf = OmegaConf.create(default_params)
+OmegaConf.save(conf, f="default_params.yaml")
+    
+@hydra.main(config_path=".", config_name="default_params")
+def _main(cfg: DictConfig):
 
     latest = -1
     #@markdown check `batch_mode` to run batch settings
@@ -140,8 +152,11 @@ if __name__ == '__main__':
       try:
         params = default_params
         # https://clear.ml/docs/latest/docs/guides/reporting/hyper_parameters/
-        #params = task.connect(params) # 
-        writer.add_hparams(hparam_dict=params, metric_dict={})
+        params = task.connect(params) # 
+        #writer.add_hparams(hparam_dict=params, metric_dict={})
+        # this tensorboard call does nothing. 
+        # better approach: pass parameters to script via OmegaConf/Hydra
+        # https://github.com/allegroai/clearml/blob/master/examples/frameworks/hydra/hydra_example.py
         # uh...
         params = Bunch(params) # fuck it... # probably easier to use an argparse namesapce here
       except NameError:
@@ -572,3 +587,6 @@ if __name__ == '__main__':
     except RuntimeError:
       print_vram_usage()
       raise
+
+if __name__ == '__main__':
+    _main()
