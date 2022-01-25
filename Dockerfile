@@ -124,7 +124,8 @@ RUN ${PIP} install clearml==1.1.5
 COPY pytti_cli_w_clearml.py .
 #COPY clearml.conf /home/clearml.conf
 COPY clearml.conf /root/clearml.conf
-COPY default_params.json .
+#COPY default_params.json .
+COPY ./config /opt/colab/config
 
 #RUN mkdir -p /opt/colab
 #WORKDIR /opt/colab
