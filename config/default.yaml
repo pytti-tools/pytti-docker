@@ -1,6 +1,9 @@
+# Use VISSL config system as a model of hydra/omegaconf best practices
+#  - https://github.com/facebookresearch/vissl/blob/main/vissl/config/defaults.yaml
+#  - https://vissl.readthedocs.io/en/latest/hydra_config.html
+
 defaults:
-  - animation_mode: 3D
-  - shunt
+  - conf: demo
 
 scenes: deep space habitation ring made of glass | galactic nebula | wow! space is
   full of fractal creatures darting around everywhere like fireflies
@@ -29,6 +32,7 @@ palette_normalization_weight: 0.2
 show_palette: false
 target_palette: ''
 lock_palette: false
+animation_mode: 3D
 sampling_mode: bicubic
 infill_mode: wrap
 pre_animation_steps: 100
@@ -43,8 +47,10 @@ video_path: ''
 frame_stride: 1
 reencode_each_frame: true
 flow_long_term_samples: 1
-translate_x: -1700*sin(radians(1.5))
+translate_x: '-1700*sin(radians(1.5))'
 translate_y: '0'
+translate_z_3d: '(50+10*t)*sin(t/10*pi)**2'
+rotate_3d: '[cos(radians(1.5)), 0, -sin(radians(1.5))/sqrt(2), sin(radians(1.5))/sqrt(2)]'
 rotate_2d: '5'
 zoom_x_2d: '0'
 zoom_y_2d: '0'
