@@ -18,16 +18,17 @@ Contributions welcome.
 2. Add your `clearml.conf` to the root directory
 3. Build the container
 
-    $ docker build -t pytti:test .
+      ``` $ docker build -t pytti:test . ```
     
-  This automates installing packages for PYTTI and downloading pre-trained models.
+      This automates installing packages for PYTTI and downloading pre-trained models.
 
 4. Start the container
 
-    $ mkdir /opt/colab/images_out
-    $ docker run --rm -it -p 8181:8181 --gpus all -v /opt/colab/images_out:/opt/colab/images_out pytti:test
+      ``` $ mkdir /opt/colab/images_out ```
+      ``` $ docker run --rm -it -p 8181:8181 --gpus all -v /opt/colab/images_out:/opt/colab/images_out pytti:test ```
+      
     
-  You should know have a jupyter server running at http://localhost:8181/lab?token=UniqueNewYork . (You should change that token for security)
+      You should know have a jupyter server running at http://localhost:8181/lab?token=UniqueNewYork . (You should change that token for security)
 
 ## Usage
 
@@ -40,6 +41,6 @@ Additionally, the container contains a modified version of the notebook code whi
 2. Open a terminal on the jupyter server
 3. Run the script, passing the experiment defining config as an argument for hydra.
 
-    python pytti_cli_w_clearml.py conf=demo
+      ``` $ python pytti_cli_w_clearml.py conf=demo ```
     
   Because the config is managed by hydra, you can override experiment parameters by specifspecified them on the command line.
