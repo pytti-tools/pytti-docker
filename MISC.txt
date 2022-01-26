@@ -5,9 +5,9 @@ cd ~/proj/pytti-docker
 
 ./download_models.sh
 
-sudo docker build -t pytti:test .
-#sudo docker run --rm -it -p 8181:8181 --gpus all -v /opt/projdata:/opt/colab/images_out pytti:test
-#sudo docker ps
+docker build -t pytti:test .
+# docker run --rm -it -p 8181:8181 --gpus all -v /opt/colab/images_out:/opt/colab/images_out pytti:test
+# docker ps
 
 python pytti_cli_w_clearml.py conf=demo
 
