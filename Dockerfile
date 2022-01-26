@@ -87,6 +87,9 @@ RUN ${PIP} install \
    scikit-learn
    #sklearn
    #regex==2.5.109 \
+   loguru \
+   hydra-core \
+   setuptools==59.5.0
 
 RUN apt-get install -y git
 
@@ -120,7 +123,8 @@ RUN touch /opt/colab/GMA/core/__init__.py
 
 #############
 
-RUN ${PIP} install clearml==1.1.5
+#RUN ${PIP} install clearml==1.1.5
+RUN ${PIP} install clearml
 COPY pytti_cli_w_clearml.py .
 #COPY clearml.conf /home/clearml.conf
 COPY clearml.conf /root/clearml.conf
