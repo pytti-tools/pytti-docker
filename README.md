@@ -38,7 +38,7 @@ Additionally, the container contains a modified version of the notebook code whi
 1. Define a new experiment by adding a config file to the ./config/conf directory. You only need to specify anything you want changed from the defaults, which are specified in ./config/default.yaml . Let's say you named your experiment configuration: ./config/conf/demo.yaml
 
 2. Open a terminal on the jupyter server
-3. Run the script, passing the experiment defining config as a 
+3. Run the script, passing the experiment defining config as an argument for hydra.
 
     python pytti_cli_w_clearml.py conf=demo
     
