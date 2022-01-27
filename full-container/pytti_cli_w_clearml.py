@@ -155,7 +155,8 @@ def _main(cfg: DictConfig):
       try:
         params = default_params
         # https://clear.ml/docs/latest/docs/guides/reporting/hyper_parameters/
-        params = task.connect(params) # 
+        if USE_CLEARML:
+            params = task.connect(params) # 
         #writer.add_hparams(hparam_dict=params, metric_dict={})
         # this tensorboard call does nothing. 
         # better approach: pass parameters to script via OmegaConf/Hydra
@@ -375,12 +376,18 @@ def _main(cfg: DictConfig):
             rec = model.dataframe[0].iloc[-1]
             print(rec)
             for k,v in rec.iteritems():
-                task.get_logger().report_scalar(
-                    "losses",
-                    f"{k}",
-                    value=v,
-                    iteration=i
+                #task.get_logger().report_scalar(
+                #    "losses",
+                #    f"{k}",
+                #    value=v,
+                #    iteration=i
+                #    )
+                writer.add_scalar(
+                    tag=f"losses/{k}",
+                    scalar_value=v,
+                    global_step=i
                     )
+
           if params.approximate_vram_usage:
             print("VRAM Usage:")
             print_vram_usage()
