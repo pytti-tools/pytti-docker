@@ -14,7 +14,11 @@ RUN git clone https://github.com/openai/CLIP.git && \
 # this works
 RUN touch /opt/colab/GMA/core/__init__.py
 
-RUN mkdir -p AdaBins/pretrained 
+COPY download_models.sh .
+RUN mkdir ./models && ./download_models.sh
+RUN mkdir -p AdaBins/pretrained && \
+    cp models/AdaBins_nyu.pt AdaBins/pretrained/ 
+
 
 #COPY models/AdaBins_nyu.pt AdaBins/pretrained/   
 
