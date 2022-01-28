@@ -7,9 +7,7 @@ RUN git clone https://github.com/openai/CLIP.git && \
     git clone https://github.com/shariqfarooq123/AdaBins.git && \
     git clone https://github.com/zacjiang/GMA.git
 
-RUN git clone --branch p5-cli https://github.com/pytti-tools/pytti-core.git pytti && \
-    cd pytti && \
-    git checkout fc414318
+RUN git clone --branch p5-cli https://github.com/pytti-tools/pytti-core.git pytti && cd pytti && git checkout fc414318
 
 # this works
 RUN touch /opt/colab/GMA/core/__init__.py
