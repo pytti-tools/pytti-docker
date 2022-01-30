@@ -13,6 +13,11 @@ ARG COLAB_PORT=8181
 EXPOSE ${COLAB_PORT}
 ENV COLAB_PORT ${COLAB_PORT}
 
+# Tensorboard
+ARG TENSORBOARD_PORT=6006
+EXPOSE ${TENSORBOARD_PORT}
+ENV TENSORBOARD_PORT ${TENSORBOARD_PORT}
+
 #################
 
 #RUN apt-get update && apt-get -y dist-upgrade
@@ -45,16 +50,6 @@ RUN ${PIP} install --no-cache-dir --use-deprecated=html5lib \
       torch==1.10.2+cu113 \
       torchvision==0.11.3+cu113 \
       torchaudio==0.10.2+cu113 -f https://download.pytorch.org/whl/cu113/torch_stable.html
-
-# suppress interactive tzdata configuration
-#RUN DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get -y install tzdata
-
-# install cv2
-#RUN apt-get update --fix-missing
-#RUN apt-get install -y python3-opencv
-
-# for video in/out
-#RUN apt-get install -y ffmpeg
 
 RUN git clone --branch ${CI_BRANCH_NAME} https://github.com/pytti-tools/pytti-core.git pytti && cd pytti && git checkout da342e7
 RUN git clone --branch ${CI_BRANCH_NAME} https://github.com/pytti-tools/pytti-notebook.git && cd pytti-notebook && git checkout 09c1d32
